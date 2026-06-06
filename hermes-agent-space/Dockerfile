@@ -61,7 +61,8 @@ RUN chmod +x \
     /usr/local/share/huggingmes/cloudflare-proxy-setup.py \
     /usr/local/share/huggingmes/cloudflare-keepalive-setup.py \
     && test -x /usr/local/bin/huggingmes-start \
-    && test -f /usr/local/share/huggingmes/health-server.js
+    && test -f /usr/local/share/huggingmes/health-server.js \
+    && /bin/bash -n /usr/local/bin/huggingmes-start
 
 # Patch kanban migration: wrap ALTER TABLE ADD COLUMN in try/except so a
 # persisted DB with the column already present doesn't crash the gateway.
@@ -126,4 +127,4 @@ EXPOSE 7861
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s \
   CMD curl -fsS http://localhost:7861/health || exit 1
 
-CMD ["/usr/local/bin/huggingmes-start"]
+CMD ["/bin/bash", "/usr/local/bin/huggingmes-start"]
