@@ -46,23 +46,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && chmod 0440 /etc/sudoers.d/hermes \
     && /usr/sbin/visudo -cf /etc/sudoers.d/hermes
 
-COPY --chown=hermes:hermes start.sh /usr/local/bin/huggingmes-start
-COPY --chown=hermes:hermes health-server.js /usr/local/share/huggingmes/health-server.js
-COPY --chown=hermes:hermes hermes-sync.py /usr/local/share/huggingmes/hermes-sync.py
-COPY --chown=hermes:hermes cloudflare-proxy-setup.py /usr/local/share/huggingmes/cloudflare-proxy-setup.py
-COPY --chown=hermes:hermes cloudflare-keepalive-setup.py /usr/local/share/huggingmes/cloudflare-keepalive-setup.py
-COPY --chown=hermes:hermes env-builder.html /usr/local/share/huggingmes/env-builder.html
-COPY --chown=hermes:hermes env-builder.js /usr/local/share/huggingmes/env-builder.js
-COPY --chown=hermes:hermes resolve-telegram-host.mjs /usr/local/share/huggingmes/resolve-telegram-host.mjs
+COPY --chown=hermes:hermes start.sh /opt/huggingmes/start.sh
+COPY --chown=hermes:hermes health-server.js /opt/huggingmes/health-server.js
+COPY --chown=hermes:hermes hermes-sync.py /opt/huggingmes/hermes-sync.py
+COPY --chown=hermes:hermes cloudflare-proxy-setup.py /opt/huggingmes/cloudflare-proxy-setup.py
+COPY --chown=hermes:hermes cloudflare-keepalive-setup.py /opt/huggingmes/cloudflare-keepalive-setup.py
+COPY --chown=hermes:hermes env-builder.html /opt/huggingmes/env-builder.html
+COPY --chown=hermes:hermes env-builder.js /opt/huggingmes/env-builder.js
+COPY --chown=hermes:hermes resolve-telegram-host.mjs /opt/huggingmes/resolve-telegram-host.mjs
 
 RUN chmod +x \
-    /usr/local/bin/huggingmes-start \
-    /usr/local/share/huggingmes/hermes-sync.py \
-    /usr/local/share/huggingmes/cloudflare-proxy-setup.py \
-    /usr/local/share/huggingmes/cloudflare-keepalive-setup.py \
-    && test -x /usr/local/bin/huggingmes-start \
-    && test -f /usr/local/share/huggingmes/health-server.js \
-    && /bin/bash -n /usr/local/bin/huggingmes-start
+    /opt/huggingmes/start.sh \
+    /opt/huggingmes/hermes-sync.py \
+    /opt/huggingmes/cloudflare-proxy-setup.py \
+    /opt/huggingmes/cloudflare-keepalive-setup.py
 
 # Patch kanban migration: wrap ALTER TABLE ADD COLUMN in try/except so a
 # persisted DB with the column already present doesn't crash the gateway.
@@ -117,7 +114,7 @@ RUN echo 'export PATH="/opt/hermes/.venv/bin:/opt/data/.local/bin:$PATH"' \
     > /etc/profile.d/hermes-venv.sh
 
 ENV HERMES_HOME=/opt/data \
-    HUGGINGMES_APP_DIR=/usr/local/share/huggingmes \
+    HUGGINGMES_APP_DIR=/opt/huggingmes \
     HERMES_AGENT_VERSION=${HERMES_AGENT_VERSION} \
     PYTHONUNBUFFERED=1 \
     PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
@@ -127,4 +124,4 @@ EXPOSE 7861
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s \
   CMD curl -fsS http://localhost:7861/health || exit 1
 
-CMD ["/bin/bash", "/usr/local/bin/huggingmes-start"]
+CMD ["/opt/huggingmes/start.sh"]
