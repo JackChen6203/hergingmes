@@ -1,0 +1,12 @@
+.git
+.venv
+venv
+__pycache__
+*.pyc
+node_modules
+.env
+token.json
+*.log
+*_logs*.txt
+current_*
+scratch
